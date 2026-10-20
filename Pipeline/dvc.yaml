@@ -1,0 +1,42 @@
+stages:
+  preprocess:
+    cmd: python src/preprocess.py
+    deps:
+    - data/fruits.csv
+    - src/preprocess.py
+    outs:
+    - data/fruits_clean.csv
+  train:
+    cmd: python src/train.py
+    deps:
+    - data/fruits_clean.csv
+    - src/train.py
+    outs:
+    - Deploiement_ML_DL/models/figures/clusters.png
+    - Deploiement_ML_DL/models/figures/elbow.png
+    - Deploiement_ML_DL/models/figures/silhouette.png
+    - Deploiement_ML_DL/models/fruits_clustered.csv
+    - Deploiement_ML_DL/models/model.joblib
+  evaluate:
+    cmd: python src/evaluate.py
+    deps:
+    - data/fruits_clean.csv
+    - src/evaluate.py
+    - Deploiement_ML_DL/models/model.joblib
+    outs:
+    - Deploiement_ML_DL/models/evaluate_metrics.json
+  report:
+    cmd: python src/generate_evidently_report.py
+    deps:
+    - data/fruits_clean.csv
+    - src/generate_evidently_report.py
+    outs:
+    - Deploiement_ML_DL/models/evidently_report.html
+  shap:
+    cmd: python src/xai_shap.py
+    deps:
+    - data/fruits_clean.csv
+    - src/xai_shap.py
+    - models/model.joblib
+    outs:
+    - Deploiement_ML_DL/models/figures/shap_summary.png

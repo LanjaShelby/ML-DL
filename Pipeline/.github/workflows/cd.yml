@@ -1,0 +1,35 @@
+name: CD
+
+on:
+  push:
+    branches: [ main ]
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v4
+      with:
+        fetch-depth: 0 
+    - name: Deploy ML_DL to Hugging Face
+      env:
+        HF_TOKEN: ${{ secrets.HF_TOKEN }}
+        HF_REPO: ${{ secrets.HF_REPO }}
+      run: |
+        cd Deploiement_ML_DL
+        
+        git init
+        git config user.name "github-actions[bot]"
+        git config user.email "github-actions[bot]@users.noreply.github.com"
+        
+        git config --global init.defaultBranch main
+        git checkout -b main
+        
+        git add .
+        if [ -n "$(git status --porcelain)" ]; then
+          git commit -m "Deploy app to Hugging Face"
+          git remote add origin "https://__token__:${HF_TOKEN}@huggingface.co/${HF_REPO}"
+          git push --force origin main
+        else
+          echo "Aucun changement détecté dans Deploiement_ML_DL. Rien à déployer."
+        fi
